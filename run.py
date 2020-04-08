@@ -37,17 +37,17 @@ def train(args):
     Args:
         args: dict that contains options in command
     """
-    sent_vocab = Vocab.load(args['SENT_VOCAB'])
-    tag_vocab = Vocab.load(args['TAG_VOCAB'])
-    train_data, dev_data = utils.generate_train_dev_dataset(args['TRAIN'], sent_vocab, tag_vocab)
+    sent_vocab = Vocab.load(args.SENT_VOCAB)
+    tag_vocab = Vocab.load(args.TAG_VOCAB)
+    train_data, dev_data = utils.generate_train_dev_dataset(args.TRAIN, sent_vocab, tag_vocab)
     print('num of training examples: %d' % (len(train_data)))
     print('num of development examples: %d' % (len(dev_data)))
 
-    max_epoch = int(args['--max-epoch'])
-    log_every = int(args['--log-every'])
-    validation_every = int(args['--validation-every'])
-    model_save_path = args['--model-save-path']
-    optimizer_save_path = args['--optimizer-save-path']
+    max_epoch = int(args.max_epoch)
+    log_every = int(args.log_every)
+    validation_every = int(args.validation_every)
+    model_save_path = args.model_save_path
+    optimizer_save_path = args.optimizer_save_path
     min_dev_loss = float('inf')
     # device = torch.device('cuda' if args['--cuda'] else 'cpu')
     print('cuda is available: ', torch.cuda.is_available())
@@ -56,15 +56,15 @@ def train(args):
     device = torch.device('cuda')
     patience, decay_num = 0, 0
 
-    model = bilstm_crf.BiLSTMCRF(sent_vocab, tag_vocab, float(args['--dropout-rate']), int(args['--embed-size']),
-                                 int(args['--hidden-size'])).to(device)
+    model = bilstm_crf.BiLSTMCRF(sent_vocab, tag_vocab, float(args.dropout_rate), int(args.embed_size),
+                                 int(args.hidden_size)).to(device)
     for name, param in model.named_parameters():
         if 'weight' in name:
             nn.init.normal_(param.data, 0, 0.01)
         else:
             nn.init.constant_(param.data, 0)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=float(args['--lr']))
+    optimizer = torch.optim.Adam(model.parameters(), lr=float(args.lr))
     train_iter = 0  # train iter num
     record_loss_sum, record_tgt_word_sum, record_batch_size = 0, 0, 0  # sum in one training log
     cum_loss_sum, cum_tgt_word_sum, cum_batch_size = 0, 0, 0  # sum in one validation log
@@ -72,7 +72,7 @@ def train(args):
 
     print('start training...')
     for epoch in range(max_epoch):
-        for sentences, tags in utils.batch_iter(train_data, batch_size=int(args['--batch-size'])):
+        for sentences, tags in utils.batch_iter(train_data, batch_size=int(args.batch_size)):
             train_iter += 1
             current_batch_size = len(sentences)
             sentences, sent_lengths = utils.pad(sentences, sent_vocab[sent_vocab.PAD], device)
@@ -83,7 +83,7 @@ def train(args):
             batch_loss = model(sentences, tags, sent_lengths)  # shape: (b,)
             loss = batch_loss.mean()
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=float(args['--clip_max_norm']))
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=float(args.clip_max_norm))
             optimizer.step()
 
             record_loss_sum += batch_loss.sum().item()
@@ -108,19 +108,19 @@ def train(args):
                 cum_loss_sum, cum_batch_size, cum_tgt_word_sum = 0, 0, 0
 
                 dev_loss = cal_dev_loss(model, dev_data, 64, sent_vocab, tag_vocab, device)
-                if dev_loss < min_dev_loss * float(args['--patience-threshold']):
+                if dev_loss < min_dev_loss * float(args.patience_threshold):
                     min_dev_loss = dev_loss
                     model.save(model_save_path)
                     torch.save(optimizer.state_dict(), optimizer_save_path)
                     patience = 0
                 else:
                     patience += 1
-                    if patience == int(args['--max-patience']):
+                    if patience == int(args.max_patience):
                         decay_num += 1
-                        if decay_num == int(args['--max-decay']):
+                        if decay_num == int(args.max_decay):
                             print('Early stop. Save result model to %s' % model_save_path)
                             return
-                        lr = optimizer.param_groups[0]['lr'] * float(args['--lr-decay'])
+                        lr = optimizer.param_groups[0]['lr'] * float(args.lr_decay)
                         model = bilstm_crf.BiLSTMCRF.load(model_save_path, device)
                         optimizer.load_state_dict(torch.load(optimizer_save_path))
                         for param_group in optimizer.param_groups:
@@ -139,17 +139,17 @@ def test(args):
     Args:
         args: dict that contains options in command
     """
-    sent_vocab = Vocab.load(args['SENT_VOCAB'])
-    tag_vocab = Vocab.load(args['TAG_VOCAB'])
-    sentences, tags = utils.read_corpus(args['TEST'])
+    sent_vocab = Vocab.load(args.SENT_VOCAB)
+    tag_vocab = Vocab.load(args.TAG_VOCAB)
+    sentences, tags = utils.read_corpus(args.TEST)
     sentences = utils.words2indices(sentences, sent_vocab)
     tags = utils.words2indices(tags, tag_vocab)
     test_data = list(zip(sentences, tags))
     print('num of test samples: %d' % (len(test_data)))
 
-    # device = torch.device('cuda' if args['--cuda'] else 'cpu')
+    # device = torch.device('cuda' if args.cuda else 'cpu')
     device = torch.device('cuda:0')
-    model = bilstm_crf.BiLSTMCRF.load(args['MODEL'], device)
+    model = bilstm_crf.BiLSTMCRF.load(args.MODEL, device)
     print('start testing...')
     print('using device', device)
 
@@ -159,7 +159,7 @@ def test(args):
 
     model.eval()
     with torch.no_grad():
-        for sentences, tags in utils.batch_iter(test_data, batch_size=int(args['--batch-size']), shuffle=False):
+        for sentences, tags in utils.batch_iter(test_data, batch_size=int(args.batch_size), shuffle=False):
             sentences, sent_lengths = utils.pad(sentences, sent_vocab[sent_vocab.PAD], device)
             predicted_tags = model.predict(sentences, sent_lengths)
             n_iter += 1
@@ -169,7 +169,7 @@ def test(args):
                 tp += current_tp
                 fp += current_fp
                 fn += current_fn
-            if n_iter % int(args['--log-every']) == 0:
+            if n_iter % int(args.log_every) == 0:
                 print('log: iter %d, %.1f words/sec, precision %f, recall %f, f1_score %f, time %.1f sec' %
                       (n_iter, num_words / (time.time() - start), tp / (tp + fp), tp / (tp + fn),
                        (2 * tp) / (2 * tp + fp + fn), time.time() - start))
@@ -224,11 +224,11 @@ def cal_statistics(tag, predicted_tag, tag_vocab):
     def func(tag1, tag2):
         a, b, i = 0, 0, 0
         while i < len(tag1):
-            if tag1[i] == tag_vocab['O']:
+            if tag1[i] == tag_vocab['-']:
                 i += 1
                 continue
             begin, end = i, i
-            while end + 1 < len(tag1) and tag1[end + 1] != tag_vocab['O']:
+            while end + 1 < len(tag1) and tag1[end + 1] != tag_vocab['-']:
                 end += 1
             equal = True
             for j in range(max(0, begin - 1), min(len(tag1), end + 2)):
@@ -246,21 +246,63 @@ def cal_statistics(tag, predicted_tag, tag_vocab):
     return tp, fp, fn
 
 
-def main():
-    args = docopt(__doc__)
+def main(args):
     random.seed(0)
     torch.manual_seed(0)
-    print(args)
-    if args['--cuda']:
-        torch.cuda.manual_seed(0)
-    if args['train']:
+
+    if args.train:
         train(args)
-    elif args['test']:
+    if args.test:
         test(args)
 
 
 if __name__ == '__main__':
+    """
+    Options:
+        --dropout_rate=<float>              dropout rate [default: 0.5]
+        --embed_size=<int>                  size of word embedding [default: 256]
+        --hidden_size=<int>                 size of hidden state [default: 256]
+        --batch_size=<int>                  batch-size [default: 32]
+        --max_epoch=<int>                   max epoch [default: 10]
+        --clip_max_norm=<float>             clip max norm [default: 5.0]
+        --lr=<float>                        learning rate [default: 0.001]
+        --log_every=<int>                   log every [default: 10]
+        --validation_every=<int>            validation every [default: 250]
+        --patience_threshold=<float>        patience threshold [default: 0.98]
+        --max_patience=<int>                time of continuous worse performance to decay lr [default: 4]
+        --max_decay=<int>                   time of lr decay to early stop [default: 4]
+        --lr_decay=<float>                  decay rate of lr [default: 0.5]
+        --model_save_path=<file>            model save path [default: ./model/model.pth]
+        --optimizer_save_path=<file>        optimizer save path [default: ./model/optimizer.pth]
+    """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('')
-    main()
+    parser.add_argument('--train', type=bool, default=False)
+    parser.add_argument('--test', type=bool, default=True)
+
+    parser.add_argument('--TRAIN', type=str, default='./editData/EXO.txt')
+    parser.add_argument('--TEST', type=str, default='./editData/test.txt')
+
+    parser.add_argument('--SENT_VOCAB', type=str, default='./vocab/sent_vocab.json')
+    parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/tag_vocab.json')
+
+    parser.add_argument('--MODEL', type=str, default='./model/model.pth')
+
+    parser.add_argument('--dropout_rate', type=float, default=0.5)
+    parser.add_argument('--embed_size', type=int, default=256)
+    parser.add_argument('--hidden_size', type=int, default=256)
+    parser.add_argument('--batch_size', type=int, default=32)
+    parser.add_argument('--max_epoch', type=int, default=50)
+    parser.add_argument('--clip_max_norm', type=float, default=5.0)
+    parser.add_argument('--lr', type=float, default=0.001)
+    parser.add_argument('--log_every', type=int, default=10)
+    parser.add_argument('--validation_every', type=int, default=250)
+    parser.add_argument('--patience_threshold', type=float, default=0.98)
+    parser.add_argument('--max_patience', type=int, default=4)
+    parser.add_argument('--max_decay', type=int, default=4)
+    parser.add_argument('--lr_decay', type=float, default=0.5)
+    parser.add_argument('--model_save_path', type=str, default='./model/model.pth')
+    parser.add_argument('--optimizer_save_path', type=str, default='./model/optimizer.pth')
+
+    args = parser.parse_args()
+    main(args)
