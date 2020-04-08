@@ -29,6 +29,7 @@ import torch.nn as nn
 import bilstm_crf
 import utils
 import random
+import argparse
 
 
 def train(args):
@@ -48,7 +49,11 @@ def train(args):
     model_save_path = args['--model-save-path']
     optimizer_save_path = args['--optimizer-save-path']
     min_dev_loss = float('inf')
-    device = torch.device('cuda' if args['--cuda'] else 'cpu')
+    # device = torch.device('cuda' if args['--cuda'] else 'cpu')
+    print('cuda is available: ', torch.cuda.is_available())
+    print('cuda device count: ', torch.cuda.device_count())
+    print('cuda device name: ', torch.cuda.get_device_name(0))
+    device = torch.device('cuda')
     patience, decay_num = 0, 0
 
     model = bilstm_crf.BiLSTMCRF(sent_vocab, tag_vocab, float(args['--dropout-rate']), int(args['--embed-size']),
@@ -142,7 +147,8 @@ def test(args):
     test_data = list(zip(sentences, tags))
     print('num of test samples: %d' % (len(test_data)))
 
-    device = torch.device('cuda' if args['--cuda'] else 'cpu')
+    # device = torch.device('cuda' if args['--cuda'] else 'cpu')
+    device = torch.device('cuda:0')
     model = bilstm_crf.BiLSTMCRF.load(args['MODEL'], device)
     print('start testing...')
     print('using device', device)
@@ -244,6 +250,7 @@ def main():
     args = docopt(__doc__)
     random.seed(0)
     torch.manual_seed(0)
+    print(args)
     if args['--cuda']:
         torch.cuda.manual_seed(0)
     if args['train']:
@@ -253,4 +260,7 @@ def main():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('')
     main()

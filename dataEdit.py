@@ -9,11 +9,16 @@ import re
 
 re_word = re.compile('<(.+?):[A-Z]{2}>')
 
-with open('originData/EXOBRAIN_NE_CORPUS_10000.txt', 'r', encoding='utf-8-sig') as of:
-    with open('editData/EXO.txt', 'w', encoding='utf-8-sig') as ef:
+with open('originData/wisenut_train.txt', 'r', encoding='utf-8-sig') as of:
+    with open('editData/test.txt', 'w', encoding='utf-8-sig') as ef:
         lines = of.readlines() # 한 문장씩 리스트형으로 받기
 
         for line in lines:
+            """
+            한 줄이 통째로 빈 경우
+            """
+            if line == '\n':
+                continue
             words = re.sub(':[A-Z]{2}', '', line).replace('\ufeff', '').replace('<', ' ').replace('>', ' ').split() # 띄어쓰기 단위로 분리(하나의 어절 안에 두개 이상의 tag가 있는 경우를 위해 '>'를 기준으로 띄어쓰기)
 
 
@@ -33,23 +38,23 @@ with open('originData/EXOBRAIN_NE_CORPUS_10000.txt', 'r', encoding='utf-8-sig') 
             j = 0
             k = 0
             while j != len(words):
-                if flag == 0 and words[j] in temp_list[k]:
+                if len(temp_list) != 0 and flag == 0 and words[j] in temp_list[k]:
                     for i_ in range(len(temp_list[k])):
                         if i_ == 0:
-                            # print(j, len(words), '|', len(temp_list), k)
+                            print(j, len(words), '|', len(temp_list), k)
                             ef.write(words[j] + '\t' + ner_list[k] + '_B\n')
-                            # print(words[j] + '\t' + ner_list[k] + '_B\n')
+                            print(words[j] + '\t' + ner_list[k] + '_B\n')
                             j += 1
                         else:
-                            # print(j, len(words), '|', len(temp_list), k)
+                            print(j, len(words), '|', len(temp_list), k)
                             ef.write(words[j] + '\t' + ner_list[k] + '_I\n')
-                            # print(words[j] + '\t' + ner_list[k] + '_I\n')
+                            print(words[j] + '\t' + ner_list[k] + '_I\n')
                             j += 1
                     k += 1
                     if k == len(temp_list):
                         flag = 1
                 else:
                     ef.write(words[j] + '\t-\n')
-                    # print(words[j] + '\t-\n')
+                    print(words[j] + '\t-\n')
                     j += 1
             ef.write('\n')
