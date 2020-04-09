@@ -49,6 +49,7 @@ def train(args):
     device = torch.device('cuda')
     patience, decay_num = 0, 0
 
+    # 현재 미사용 word2vec
     ko_model = gensim.models.Word2Vec.load(args.word2vec_path)
     word2vec_matrix = ko_model.wv.syn0
 
