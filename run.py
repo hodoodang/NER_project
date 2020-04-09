@@ -14,7 +14,6 @@ tp = 51, fp = 2242, fn = 2195
 Precision: 0.022242, Recall: 0.022707, F1 score: 0.022472
 """
 
-from docopt import docopt
 from vocab import Vocab
 import time
 import torch
@@ -22,6 +21,7 @@ import torch.nn as nn
 import bilstm_crf
 import utils
 import random
+import gensim
 import argparse
 
 
@@ -49,7 +49,10 @@ def train(args):
     device = torch.device('cuda')
     patience, decay_num = 0, 0
 
-    model = bilstm_crf.BiLSTMCRF(sent_vocab, tag_vocab, float(args.dropout_rate), int(args.embed_size),
+    ko_model = gensim.models.Word2Vec.load(args.word2vec_path)
+    word2vec_matrix = ko_model.wv.syn0
+
+    model = bilstm_crf.BiLSTMCRF(sent_vocab, tag_vocab, word2vec_matrix, float(args.dropout_rate), int(args.embed_size),
                                  int(args.hidden_size)).to(device)
     for name, param in model.named_parameters():
         if 'weight' in name:
@@ -270,8 +273,8 @@ if __name__ == '__main__':
     """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--train', type=bool, default=False)
-    parser.add_argument('--test', type=bool, default=True)
+    parser.add_argument('--train', type=bool, default=True)
+    parser.add_argument('--test', type=bool, default=False)
 
     parser.add_argument('--TRAIN', type=str, default='./editData/EXO.txt')
     parser.add_argument('--TEST', type=str, default='./editData/test.txt')
@@ -281,11 +284,13 @@ if __name__ == '__main__':
 
     parser.add_argument('--MODEL', type=str, default='./model/model.pth')
 
+    parser.add_argument('--word2vec_path', type=str, default='./model/word2vec/ko.bin')
+
     parser.add_argument('--dropout_rate', type=float, default=0.5)
     parser.add_argument('--embed_size', type=int, default=100)
     parser.add_argument('--hidden_size', type=int, default=256)
     parser.add_argument('--batch_size', type=int, default=32)
-    parser.add_argument('--max_epoch', type=int, default=125)
+    parser.add_argument('--max_epoch', type=int, default=50)
     parser.add_argument('--clip_max_norm', type=float, default=5.0)
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--log_every', type=int, default=10)
