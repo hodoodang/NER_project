@@ -1,0 +1,1 @@
+﻿{"word2id": {"-": 0, "DT_B": 1, "LC_B": 2, "OG_B": 3, "PS_B": 4, "DT_I": 5, "LC_I": 6, "PS_I": 7, "<START>": 8, "<END>": 9, "OG_I": 10, "TI_B": 11, "TI_I": 12, "<PAD>": 13}, "id2word": ["-", "DT_B", "LC_B", "OG_B", "PS_B", "DT_I", "LC_I", "PS_I", "<START>", "<END>", "OG_I", "TI_B", "TI_I", "<PAD>"]}
