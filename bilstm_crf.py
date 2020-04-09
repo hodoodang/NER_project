@@ -126,6 +126,7 @@ class BiLSTMCRF(nn.Module):
         params = {
             'sent_vocab': self.sent_vocab,
             'tag_vocab': self.tag_vocab,
+            'word2vec': self.word2vec,
             'args': dict(dropout_rate=self.dropout_rate, embed_size=self.embed_size, hidden_size=self.hidden_size),
             'state_dict': self.state_dict()
         }
@@ -134,7 +135,7 @@ class BiLSTMCRF(nn.Module):
     @staticmethod
     def load(filepath, device_to_load):
         params = torch.load(filepath, map_location=lambda storage, loc: storage)
-        model = BiLSTMCRF(params['sent_vocab'], params['tag_vocab'], **params['args'])
+        model = BiLSTMCRF(params['sent_vocab'], params['tag_vocab'], params['word2vec'], **params['args'])
         model.load_state_dict(params['state_dict'])
         model.to(device_to_load)
         return model
