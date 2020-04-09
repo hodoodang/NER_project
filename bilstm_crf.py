@@ -147,7 +147,7 @@ def main():
     sent_vocab = Vocab.load('./vocab/sent_vocab.json')
     tag_vocab = Vocab.load('./vocab/tag_vocab.json')
     train_data, dev_data = utils.generate_train_dev_dataset('./editData/EXO.txt', sent_vocab, tag_vocab)
-    device = torch.device('cpu')
+    device = torch.device('cuda')
     model = BiLSTMCRF(sent_vocab, tag_vocab)
     model.to(device)
     model.save('./model/model.pth')

@@ -1,24 +1,17 @@
 """
-Usage:
-    run.py train TRAIN SENT_VOCAB TAG_VOCAB [options]
-    run.py test TEST SENT_VOCAB TAG_VOCAB MODEL [options]
-Options:
-    --dropout-rate=<float>              dropout rate [default: 0.5]
-    --embed-size=<int>                  size of word embedding [default: 256]
-    --hidden-size=<int>                 size of hidden state [default: 256]
-    --batch-size=<int>                  batch-size [default: 32]
-    --max-epoch=<int>                   max epoch [default: 10]
-    --clip_max_norm=<float>             clip max norm [default: 5.0]
-    --lr=<float>                        learning rate [default: 0.001]
-    --log-every=<int>                   log every [default: 10]
-    --validation-every=<int>            validation every [default: 250]
-    --patience-threshold=<float>        patience threshold [default: 0.98]
-    --max-patience=<int>                time of continuous worse performance to decay lr [default: 4]
-    --max-decay=<int>                   time of lr decay to early stop [default: 4]
-    --lr-decay=<float>                  decay rate of lr [default: 0.5]
-    --model-save-path=<file>            model save path [default: ./model/model.pth]
-    --optimizer-save-path=<file>        optimizer save path [default: ./model/optimizer.pth]
-    --cuda                              use GPU
+train data: us | test data: us
+epoch: 125
+tp = 1195, fp = 342, fn = 1051
+Precision: 0.777489, Recall: 0.532057, F1 score: 0.631774
+
+epoch: 50
+tp = 1266, fp = 327, fn = 980
+Precision: 0.794727, Recall: 0.563669, F1 score: 0.659547
+
+train data: exo | test data: us
+epoch: 50
+tp = 51, fp = 2242, fn = 2195
+Precision: 0.022242, Recall: 0.022707, F1 score: 0.022472
 """
 
 from docopt import docopt
@@ -283,16 +276,16 @@ if __name__ == '__main__':
     parser.add_argument('--TRAIN', type=str, default='./editData/EXO.txt')
     parser.add_argument('--TEST', type=str, default='./editData/test.txt')
 
-    parser.add_argument('--SENT_VOCAB', type=str, default='./vocab/sent_vocab.json')
-    parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/tag_vocab.json')
+    parser.add_argument('--SENT_VOCAB', type=str, default='./vocab/wisenut_sent_vocab.json')
+    parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/wisenut_tag_vocab.json')
 
     parser.add_argument('--MODEL', type=str, default='./model/model.pth')
 
     parser.add_argument('--dropout_rate', type=float, default=0.5)
-    parser.add_argument('--embed_size', type=int, default=256)
+    parser.add_argument('--embed_size', type=int, default=100)
     parser.add_argument('--hidden_size', type=int, default=256)
     parser.add_argument('--batch_size', type=int, default=32)
-    parser.add_argument('--max_epoch', type=int, default=50)
+    parser.add_argument('--max_epoch', type=int, default=125)
     parser.add_argument('--clip_max_norm', type=float, default=5.0)
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--log_every', type=int, default=10)
