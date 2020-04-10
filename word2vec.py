@@ -20,7 +20,7 @@ def make_w2v_model(sentences, size=100, window=5, min_count=5, workers=4, sg=1):
 
 # 모델 로드
 def load_w2v(model_path):
-  # model_name = 'word_w2v'
+  
   loaded_model = KeyedVectors.load_word2vec_format(model_path)
   
   return loaded_model
