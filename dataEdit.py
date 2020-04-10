@@ -1,4 +1,5 @@
 import json
+import argparse
 import re
 
 # 데이터의 형식을 바꾸는 코드
@@ -9,10 +10,8 @@ import re
 
 re_word = re.compile('<(.+?):[A-Z]{2}>')
 
-with open('originData/wisenut_test.txt', 'r', encoding='utf-8-sig') as of:
-    with open('editData/test.txt', 'w', encoding='utf-8-sig') as ef:
-        lines = of.readlines() # 한 문장씩 리스트형으로 받기
-
+def dataEdit(lines, outfile_path):
+    with open(outfile_path, 'w', encoding='utf-8-sig') as ef:
         for line in lines:
             """
             한 줄이 통째로 빈 경우
@@ -58,3 +57,20 @@ with open('originData/wisenut_test.txt', 'r', encoding='utf-8-sig') as of:
                     # print(words[j] + '\t-\n')
                     j += 1
             ef.write('\n')
+    return
+
+def get_lines(read_file):
+    with open('originData/wisenut_final.txt', 'r', encoding='utf-8-sig') as of:
+        lines = of.readlines()
+    return lines
+
+def main(args):
+
+
+if __name__=='__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--file', type=str, default='./originData/wisenut_final.txt')
+
+    args = parser.parse_args()
+    main(args)

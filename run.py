@@ -24,7 +24,6 @@ import random
 import gensim
 import argparse
 
-
 def train(args):
     """ Training BiLSTMCRF model
     Args:
