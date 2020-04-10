@@ -9,7 +9,7 @@ import re
 
 re_word = re.compile('<(.+?):[A-Z]{2}>')
 
-with open('originData/wisenut_train.txt', 'r', encoding='utf-8-sig') as of:
+with open('originData/wisenut_test.txt', 'r', encoding='utf-8-sig') as of:
     with open('editData/test.txt', 'w', encoding='utf-8-sig') as ef:
         lines = of.readlines() # 한 문장씩 리스트형으로 받기
 
@@ -41,20 +41,20 @@ with open('originData/wisenut_train.txt', 'r', encoding='utf-8-sig') as of:
                 if len(temp_list) != 0 and flag == 0 and words[j] in temp_list[k]:
                     for i_ in range(len(temp_list[k])):
                         if i_ == 0:
-                            print(j, len(words), '|', len(temp_list), k)
+                            # print(j, len(words), '|', len(temp_list), k)
                             ef.write(words[j] + '\t' + ner_list[k] + '_B\n')
-                            print(words[j] + '\t' + ner_list[k] + '_B\n')
+                            # print(words[j] + '\t' + ner_list[k] + '_B\n')
                             j += 1
                         else:
-                            print(j, len(words), '|', len(temp_list), k)
+                            # print(j, len(words), '|', len(temp_list), k)
                             ef.write(words[j] + '\t' + ner_list[k] + '_I\n')
-                            print(words[j] + '\t' + ner_list[k] + '_I\n')
+                            # print(words[j] + '\t' + ner_list[k] + '_I\n')
                             j += 1
                     k += 1
                     if k == len(temp_list):
                         flag = 1
                 else:
                     ef.write(words[j] + '\t-\n')
-                    print(words[j] + '\t-\n')
+                    # print(words[j] + '\t-\n')
                     j += 1
             ef.write('\n')

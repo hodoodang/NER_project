@@ -74,11 +74,11 @@ class Vocab:
 
 
 def main():
-    sentences, tags = read_corpus('editData/EXO.txt')
+    sentences, tags = read_corpus('editData/train.txt')
     sent_vocab = Vocab.build(sentences, 10000, 1, is_tags=False)
     tag_vocab = Vocab.build(tags, 10000, 1, is_tags=True)
-    sent_vocab.save('vocab/sent_vocab.json')
-    tag_vocab.save('vocab/tag_vocab.json')
+    sent_vocab.save('vocab/wisenut_sent_vocab.json')
+    tag_vocab.save('vocab/wisenut_tag_vocab.json')
 
 if __name__ == '__main__':
     main()
