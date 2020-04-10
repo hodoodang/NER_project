@@ -273,8 +273,8 @@ if __name__ == '__main__':
     """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--train', type=bool, default=True)
-    parser.add_argument('--test', type=bool, default=False)
+    parser.add_argument('--train', type=bool, default=False)
+    parser.add_argument('--test', type=bool, default=True)
 
     parser.add_argument('--TRAIN', type=str, default='./editData/EXO.txt')
     parser.add_argument('--TEST', type=str, default='./editData/test.txt')
@@ -292,15 +292,15 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--max_epoch', type=int, default=50)
     parser.add_argument('--clip_max_norm', type=float, default=5.0)
-    parser.add_argument('--lr', type=float, default=0.001)
+    parser.add_argument('--lr', type=float, default=0.0001)
     parser.add_argument('--log_every', type=int, default=10)
     parser.add_argument('--validation_every', type=int, default=250)
     parser.add_argument('--patience_threshold', type=float, default=0.98)
     parser.add_argument('--max_patience', type=int, default=4)
     parser.add_argument('--max_decay', type=int, default=4)
     parser.add_argument('--lr_decay', type=float, default=0.5)
-    parser.add_argument('--model_save_path', type=str, default='./model/model.pth')
-    parser.add_argument('--optimizer_save_path', type=str, default='./model/optimizer.pth')
+    parser.add_argument('--model_save_path', type=str, default='./model/model_merge.pth')
+    parser.add_argument('--optimizer_save_path', type=str, default='./model/optimizer_merge.pth')
 
     args = parser.parse_args()
     main(args)
