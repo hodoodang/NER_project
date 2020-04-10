@@ -273,8 +273,8 @@ if __name__ == '__main__':
     """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--train', type=bool, default=False)
-    parser.add_argument('--test', type=bool, default=True)
+    parser.add_argument('--train', type=bool, default=True)
+    parser.add_argument('--test', type=bool, default=False)
 
     parser.add_argument('--TRAIN', type=str, default='./editData/EXO.txt')
     parser.add_argument('--TEST', type=str, default='./editData/test.txt')
