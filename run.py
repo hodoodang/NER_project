@@ -52,7 +52,7 @@ def train(args):
     ko_model = gensim.models.Word2Vec.load(args.word2vec_path)
     word2vec_matrix = ko_model.wv.syn0
 
-    model = bilstm_crf.BiLSTMCRF(sent_vocab, tag_vocab, float(args.dropout_rate), int(args.embed_size),
+    model = bilstm_crf.BiLSTMCRF(sent_vocab, tag_vocab, word2vec_matrix, float(args.dropout_rate), int(args.embed_size),
                                  int(args.hidden_size)).to(device)
     for name, param in model.named_parameters():
         if 'weight' in name:

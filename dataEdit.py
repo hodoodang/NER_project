@@ -10,6 +10,7 @@ import re
 
 re_word = re.compile('<(.+?):[A-Z]{2}>')
 
+
 def dataEdit(lines, outfile_path):
     with open(outfile_path, 'w', encoding='utf-8-sig') as ef:
         for line in lines:
@@ -18,12 +19,12 @@ def dataEdit(lines, outfile_path):
             """
             if line == '\n':
                 continue
-            words = re.sub(':[A-Z]{2}', '', line).replace('\ufeff', '').replace('<', ' ').replace('>', ' ').split() # 띄어쓰기 단위로 분리(하나의 어절 안에 두개 이상의 tag가 있는 경우를 위해 '>'를 기준으로 띄어쓰기)
-
+            words = re.sub(':[A-Z]{2}', '', line).replace('\ufeff', '').replace('<', ' ').replace('>',
+                                                                                                  ' ').split()  # 띄어쓰기 단위로 분리(하나의 어절 안에 두개 이상의 tag가 있는 경우를 위해 '>'를 기준으로 띄어쓰기)
 
             re_result = re_word.finditer(line)
-            temp_list = [] # 태깅된 단어 리스트
-            ner_list = [] # 태깅된 태그 리스트
+            temp_list = []  # 태깅된 단어 리스트
+            ner_list = []  # 태깅된 태그 리스트
 
             for re_item in re_result:
                 # print(re_item.group())
@@ -59,18 +60,24 @@ def dataEdit(lines, outfile_path):
             ef.write('\n')
     return
 
+
 def get_lines(read_file):
-    with open('originData/wisenut_final.txt', 'r', encoding='utf-8-sig') as of:
+    with open(read_file, 'r', encoding='utf-8-sig') as of:
         lines = of.readlines()
     return lines
 
+
 def main(args):
+    lines = get_lines(args.file)
+    dataEdit(lines, args.result_file)
+    return None
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--file', type=str, default='./originData/wisenut_final.txt')
+    parser.add_argument('--file', type=str, default='./originData/mergeData.txt')
+    parser.add_argument('--result_file', type=str, default='./editData/merge.txt')
 
     args = parser.parse_args()
     main(args)
