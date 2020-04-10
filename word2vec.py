@@ -25,6 +25,6 @@ def load_w2v(model_path):
   
   return loaded_model
 
-# 출력 예시 코드
+# 로드 예시 코드
 # loaded_model = load_w2v('/content/drive/My Drive/와이즈넛/NER_project/word_w2v')
 # loaded_model.wv.get_vector('가장')
