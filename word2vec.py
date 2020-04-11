@@ -1,6 +1,6 @@
-from gensim.models import Word2Vec
-from gensim.models import KeyedVectors
+from gensim.models import word2vec
 
+import re
 '''
 size = 워드 벡터의 특징 값. 즉, 임베딩 된 벡터의 차원.
 window = 컨텍스트 윈도우 크기
@@ -9,22 +9,37 @@ workers = 학습을 위한 프로세스 수
 sg = 0은 CBOW, 1은 Skip-gram.
 
 '''
-# 모델 만들기, 저장
-def make_w2v_model(sentences, size=100, window=5, min_count=5, workers=4, sg=1):
 
-  word_model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4, sg=1)
-  word_model.wv.save_word2vec_format('word_w2v') 
+def make_raw_sentence(sentence):
+  raw_sentence = re.sub(':[A-Z]{2}', '', sentence).replace('\ufeff', '').replace('<', ' ').replace('>', ' ')
+  return raw_sentence
+
+
+def get_raw_sentence(path):
+  with open(path, 'r', encoding='utf-8-sig') as f:
+    sentences = f.readlines()
+
+  sentences = list(map(make_raw_sentence, sentences))
+  sentences = [sentence.strip() for sentence in sentences]
+
+  return sentences
+
+# 모델 만들기, 저장
+def make_w2v_model(sentences, model_save_path, size=100, window=5, min_count=5, workers=4, sg=1):
+
+  word_model = word2vec.Word2Vec(sentences, size=100, window=5, min_count=5, workers=4, sg=1)
+  word_model.save(model_save_path)
 
   print('model save success!')
 
 
-# 모델 로드
-def load_w2v(model_path):
-  
-  loaded_model = KeyedVectors.load_word2vec_format(model_path)
-  
-  return loaded_model
 
-# 로드 예시 코드
-# loaded_model = load_w2v('/content/drive/My Drive/와이즈넛/NER_project/word_w2v')
-# loaded_model.wv.get_vector('가장')
+def main():
+  data_path = 'originData/mergeData.txt'
+  model_save_path = 'model/word2vec/merge_w2v.model'
+  sentences = get_raw_sentence(data_path)
+  make_w2v_model(sentences, model_save_path)
+
+
+if __name__ == '__main__':
+  main()

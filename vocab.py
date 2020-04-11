@@ -8,7 +8,6 @@ Options:
 from itertools import chain
 from collections import Counter
 from utils import read_corpus
-from docopt import docopt
 import json
 
 

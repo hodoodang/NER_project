@@ -33,7 +33,7 @@ def main(args):
     random.seed(2020)
 
     data_merge(args.first_file, args.second_file, args.merge_file)
-    data = dataEdit.get_lines(args.merge_file)
+    data = dataEdit.get_lines(args.merge_file) # 한 줄 씩 읽어서 리스트에 저장한 값을 반환(태깅 된 상태)
 
     train, test = train_test_split(data, train_size=0.9, test_size=0.1, random_state=2020, shuffle=True)
     dataEdit.dataEdit(train, args.train)
@@ -49,6 +49,7 @@ if __name__=='__main__':
 
     parser.add_argument('--train', type=str, default='./editData/train.txt')
     parser.add_argument('--test', type=str, default='./editData/test.txt')
+
 
     args = parser.parse_args()
     main(args)
