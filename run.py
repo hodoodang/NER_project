@@ -61,7 +61,8 @@ def train(args):
         else:
             nn.init.constant_(param.data, 0)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=float(args.lr))
+    # optimizer = torch.optim.Adam(model.parameters(), lr=float(args.lr))
+    optimizer = torch.optim.RMSprop(model.parameters(), lr=float(args.lr))
     train_iter = 0  # train iter num
     record_loss_sum, record_tgt_word_sum, record_batch_size = 0, 0, 0  # sum in one training log
     cum_loss_sum, cum_tgt_word_sum, cum_batch_size = 0, 0, 0  # sum in one validation log
@@ -69,6 +70,7 @@ def train(args):
 
     print('start training...')
     for epoch in range(max_epoch):
+        n_correct, n_total = 0, 0
         for sentences, tags in utils.batch_iter(train_data, batch_size=int(args.batch_size)):
             train_iter += 1
             current_batch_size = len(sentences)
@@ -105,6 +107,7 @@ def train(args):
                 cum_loss_sum, cum_batch_size, cum_tgt_word_sum = 0, 0, 0
 
                 dev_loss = cal_dev_loss(model, dev_data, 64, sent_vocab, tag_vocab, device)
+                cal_f1_score(model, dev_data, 64, sent_vocab, tag_vocab, device)
                 if dev_loss < min_dev_loss * float(args.patience_threshold):
                     min_dev_loss = dev_loss
                     model.save(model_save_path)
@@ -204,6 +207,42 @@ def cal_dev_loss(model, dev_data, batch_size, sent_vocab, tag_vocab, device):
     model.train(is_training)
     return loss / n_sentences
 
+def cal_f1_score(model, dev_data, batch_size, sent_vocab, tag_vocab, device):
+    """
+    :param model:
+    :param dev_data:
+    :param batch_size:
+    :param sent_vocab:
+    :param tag_vocab:
+    :param device:
+    :return:
+    """
+    n_iter, num_words = 0, 0
+    tp, fp, fn = 0, 0, 0
+    model.eval()
+    with torch.no_grad():
+        for sentences, tags in utils.batch_iter(dev_data, batch_size=int(batch_size), shuffle=False):
+            sentences, sent_lengths = utils.pad(sentences, sent_vocab[sent_vocab.PAD], device)
+            predicted_tags = model.predict(sentences, sent_lengths)
+            n_iter += 1
+            num_words += sum(sent_lengths)
+            for tag, predicted_tag in zip(tags, predicted_tags):
+                current_tp, current_fp, current_fn = cal_statistics(tag, predicted_tag, tag_vocab)
+                tp += current_tp
+                fp += current_fp
+                fn += current_fn
+            if n_iter % int(args.log_every) == 0:
+                print('log: iter %d precision %f, recall %f, f1_score %f' %
+                      (n_iter, tp / (tp + fp), tp / (tp + fn),
+                       (2 * tp) / (2 * tp + fp + fn)))
+                num_words = 0
+                start = time.time()
+    print('tp = %d, fp = %d, fn = %d' % (tp, fp, fn))
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    f1_score = (2 * tp) / (2 * tp + fp + fn)
+    print('Precision: %f, Recall: %f, F1 score: %f' % (precision, recall, f1_score))
+
 
 def cal_statistics(tag, predicted_tag, tag_vocab):
     """ Calculate TN, FN, FP for the given true tag and predicted tag.
@@ -244,13 +283,15 @@ def cal_statistics(tag, predicted_tag, tag_vocab):
 
 
 def main(args):
-    random.seed(0)
-    torch.manual_seed(0)
 
-    if args.train:
-        train(args)
-    if args.test:
-        test(args)
+    for i in range(1):
+        random.seed(0)
+        torch.manual_seed(0)
+
+        if args.train:
+            train(args)
+        if args.test:
+            test(args)
 
 
 if __name__ == '__main__':
@@ -276,8 +317,8 @@ if __name__ == '__main__':
 
     parser.add_argument('--cuda', type=int, default=1)
 
-    parser.add_argument('--train', type=bool, default=True)
-    parser.add_argument('--test', type=bool, default=False)
+    parser.add_argument('--train', type=bool, default=False)
+    parser.add_argument('--test', type=bool, default=True)
 
     parser.add_argument('--TRAIN', type=str, default='./editData/train.txt')
     parser.add_argument('--TEST', type=str, default='./editData/test.txt')
@@ -295,12 +336,12 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--max_epoch', type=int, default=50)
     parser.add_argument('--clip_max_norm', type=float, default=5.0)
-    parser.add_argument('--lr', type=float, default=0.0001)
+    parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--log_every', type=int, default=10)
     parser.add_argument('--validation_every', type=int, default=250)
     parser.add_argument('--patience_threshold', type=float, default=0.98)
     parser.add_argument('--max_patience', type=int, default=4)
-    parser.add_argument('--max_decay', type=int, default=4)
+    parser.add_argument('--max_decay', type=int, default=6)
     parser.add_argument('--lr_decay', type=float, default=0.5)
     parser.add_argument('--model_save_path', type=str, default='./model/model_merge.pth')
     parser.add_argument('--optimizer_save_path', type=str, default='./model/optimizer_merge.pth')

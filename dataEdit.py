@@ -14,7 +14,7 @@ re_word = re.compile('<(.+?):[A-Z]{2}>')
 mecab = Mecab()
 
 
-def dataEdit(lines, outfile_path):
+def data_edit(lines, outfile_path):
     with open(outfile_path, 'w', encoding='utf-8-sig') as ef:
         for line in lines:
             """
@@ -24,22 +24,22 @@ def dataEdit(lines, outfile_path):
                 continue
             morphs, tags = make_morph_tag(line)
 
-
             for morph, tag in zip(morphs, tags):
                 ef.write(morph + '\t' + tag + '\n')
             ef.write('\n')  # 문장끼리 구분하기 위한 공백 추가
     return
 
+
 def make_morph_tag(text):
 
-    '''
+    """
     ###### example ######
 
     input  : text = '<두산:OG> <홍성흔:PS>(31)의 입담은 여전했다 .'
 
     output : (['두산', '홍성흔', '(', '31', ')', '의', '입담', '은', '여전', '했', '다', '.'],
               ['OG', 'PS', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'])
-    '''
+    """
 
     entity_compile = re.compile('[<](.*?)[:]')
     tag_compile = re.compile('[:]([A-Z]{2})[>]')
@@ -120,7 +120,6 @@ def make_morph_tag(text):
                 entity_len = 0
 
     return morphs, tags
-
 
 
 def get_lines(read_file):
@@ -220,10 +219,19 @@ def make_morphs_tags(text):
     return morphs, tags
 
 
+def make_morphs(text):
+    morphs = []
+    for t in text:
+        if t == '\n':
+            continue
+        morph, tags = make_morph_tag(t)
+        morphs.append(morph)
+    return morphs
+
 
 def main(args):
     lines = get_lines(args.file)
-    dataEdit(lines, args.result_file)
+    data_edit(lines, args.result_file)
     return None
 
 

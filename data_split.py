@@ -28,7 +28,6 @@ def data_merge(first_file, second_file, merge_file):
     return None
 
 
-
 def main(args):
     random.seed(2020)
 
@@ -36,8 +35,8 @@ def main(args):
     data = dataEdit.get_lines(args.merge_file) # 한 줄 씩 읽어서 리스트에 저장한 값을 반환(태깅 된 상태)
 
     train, test = train_test_split(data, train_size=0.9, test_size=0.1, random_state=2020, shuffle=True)
-    dataEdit.dataEdit(train, args.train)
-    dataEdit.dataEdit(test, args.test)
+    dataEdit.data_edit(train, args.train)
+    dataEdit.data_edit(test, args.test)
 
 
 if __name__=='__main__':

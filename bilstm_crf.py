@@ -22,7 +22,7 @@ class BiLSTMCRF(nn.Module):
         self.tag_vocab = tag_vocab
         self.word2vec = word2vec
         self.embedding = nn.Embedding(len(sent_vocab), embed_size)
-        self.embedding.from_pretrained(torch.nn.parameter.Parameter(torch.Tensor(self.word2vec)))
+        self.embedding.from_pretrained(torch.nn.parameter.Parameter(torch.Tensor(self.word2vec)), freeze=False)
         self.dropout = nn.Dropout(dropout_rate)
         self.encoder = nn.LSTM(input_size=embed_size, hidden_size=hidden_size, bidirectional=True)
         self.hidden2emit_score = nn.Linear(hidden_size * 2, len(self.tag_vocab))

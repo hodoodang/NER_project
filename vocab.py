@@ -74,8 +74,8 @@ class Vocab:
 
 def main():
     sentences, tags = read_corpus('editData/train.txt')
-    sent_vocab = Vocab.build(sentences, 10000, 1, is_tags=False)
-    tag_vocab = Vocab.build(tags, 10000, 1, is_tags=True)
+    sent_vocab = Vocab.build(sentences, 100000, 1, is_tags=False)
+    tag_vocab = Vocab.build(tags, 100000, 1, is_tags=True)
     sent_vocab.save('vocab/merge_sent_vocab.json')
     tag_vocab.save('vocab/merge_tag_vocab.json')
 
