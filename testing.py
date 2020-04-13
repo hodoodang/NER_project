@@ -6,11 +6,18 @@ import utils
 from vocab import Vocab
 
 
-def print_line(line):
+def print_line(line, model_path='./model/model.pth', sent_vocab_path='./vocab/sent_vocab.json', tag_vocab_path='./vocab/tag_vocab.json'):
+    """
+    :param line: text line
+    :param model_path: model path
+    :param sent_vocab_path: sentence vocab path
+    :param tag_vocab_path: tag vocab path
+    :return: print text and tag
+    """
     device = torch.device('cuda:0')
-    sent_vocab = Vocab.load(args.SENT_VOCAB)
-    tag_vocab = Vocab.load(args.TAG_VOCAB)
-    model = bilstm_crf.BiLSTMCRF.load(args.MODEL, device)
+    sent_vocab = Vocab.load(sent_vocab_path)
+    tag_vocab = Vocab.load(tag_vocab_path)
+    model = bilstm_crf.BiLSTMCRF.load(model_path, device)
 
     morph_line, tags = dataEdit.make_morph_tag(line)
 
@@ -63,13 +70,13 @@ def print_line(line):
     return
 
 
-def main(args):
+def main():
     lines = dataEdit.get_lines(args.sample_data)
     lines = list(map(lambda s: s.strip(), lines))
     for line in lines:
         if line == '':
             continue
-        print_line(line)
+        print_line(line, args.MODEL, args.SENT_VOCAB, args.TAG_VOCAB)
     return
 
 
@@ -82,4 +89,4 @@ if __name__ == '__main__':
     parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/tag_vocab.json')
     args = parser.parse_args()
 
-    main(args)
+    main()
