@@ -217,6 +217,7 @@ def cal_f1_score(model, dev_data, batch_size, sent_vocab, tag_vocab, device):
     :param device:
     :return:
     """
+    is_training = model.training
     n_iter, num_words = 0, 0
     tp, fp, fn = 0, 0, 0
     model.eval()
@@ -242,6 +243,7 @@ def cal_f1_score(model, dev_data, batch_size, sent_vocab, tag_vocab, device):
     recall = tp / (tp + fn)
     f1_score = (2 * tp) / (2 * tp + fp + fn)
     print('Precision: %f, Recall: %f, F1 score: %f' % (precision, recall, f1_score))
+    model.train(is_training)
 
 
 def cal_statistics(tag, predicted_tag, tag_vocab):
@@ -317,7 +319,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--cuda', type=int, default=1)
 
-    parser.add_argument('--train', type=bool, default=False)
+    parser.add_argument('--train', type=bool, default=True)
     parser.add_argument('--test', type=bool, default=True)
 
     parser.add_argument('--TRAIN', type=str, default='./editData/train.txt')
