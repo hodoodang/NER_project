@@ -322,13 +322,13 @@ if __name__ == '__main__':
     parser.add_argument('--train', type=bool, default=True)
     parser.add_argument('--test', type=bool, default=True)
 
-    parser.add_argument('--TRAIN', type=str, default='./editData/train.txt')
+    parser.add_argument('--TRAIN', type=str, default='./editData/merge.txt')
     parser.add_argument('--TEST', type=str, default='./editData/test.txt')
 
-    parser.add_argument('--SENT_VOCAB', type=str, default='./vocab/merge_sent_vocab.json')
-    parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/merge_tag_vocab.json')
+    parser.add_argument('--SENT_VOCAB', type=str, default='./vocab/sent_vocab.json')
+    parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/tag_vocab.json')
 
-    parser.add_argument('--MODEL', type=str, default='./model/model_merge.pth')
+    parser.add_argument('--MODEL', type=str, default='./model/model.pth')
 
     parser.add_argument('--word2vec_path', type=str, default='./model/word2vec/merge_w2v.model')
 
@@ -345,8 +345,8 @@ if __name__ == '__main__':
     parser.add_argument('--max_patience', type=int, default=4)
     parser.add_argument('--max_decay', type=int, default=6)
     parser.add_argument('--lr_decay', type=float, default=0.5)
-    parser.add_argument('--model_save_path', type=str, default='./model/model_merge.pth')
-    parser.add_argument('--optimizer_save_path', type=str, default='./model/optimizer_merge.pth')
+    parser.add_argument('--model_save_path', type=str, default='./model/model.pth')
+    parser.add_argument('--optimizer_save_path', type=str, default='./model/optimizer.pth')
 
     args = parser.parse_args()
     main(args)

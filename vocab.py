@@ -73,11 +73,11 @@ class Vocab:
 
 
 def main():
-    sentences, tags = read_corpus('editData/train.txt')
+    sentences, tags = read_corpus('editData/merge.txt')
     sent_vocab = Vocab.build(sentences, 100000, 1, is_tags=False)
     tag_vocab = Vocab.build(tags, 100000, 1, is_tags=True)
-    sent_vocab.save('vocab/merge_sent_vocab.json')
-    tag_vocab.save('vocab/merge_tag_vocab.json')
+    sent_vocab.save('vocab/sent_vocab.json')
+    tag_vocab.save('vocab/tag_vocab.json')
 
 if __name__ == '__main__':
     main()
