@@ -105,19 +105,14 @@ def main(args):
 
     # print(sent)
     answer = []
-    for tag, word in zip(tags, sent):
+    for word in sent:
         result = ""
-        for t, w in zip(tag, word):
-            # if t != '-':
-            #     result += w + '<' + t + '>'
+        for w in word:
             result += w
         answer.append(result)
     answer, tag_list = compare_sentence(text, answer, tags)
 
     for i in range(len(answer)):
-        # print(answer[i])
-        # print(morph_lines[i])
-        # print(tag_list[i])
         temp = answer[i]
 
         for j in range(len(morph_lines[i])):
@@ -127,17 +122,15 @@ def main(args):
             else:
                 temp = (temp[:temp.find(morph_lines[i][j])] + '<' + tag_list[i][j].split('_')[0] + '>' + temp[temp.find(morph_lines[i][j]):])
         print(temp)
-    # print(answer)
-    # print(tag_list)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--MODEL', type=str, default='./model/model_merge.pth')
+    parser.add_argument('--MODEL', type=str, default='./model/model.pth')
     parser.add_argument('--sample_data', type=str, default='./originData/sample_data.txt')
-    parser.add_argument('--SENT_VOCAB', type=str, default='./vocab/merge_sent_vocab.json')
-    parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/merge_tag_vocab.json')
+    parser.add_argument('--SENT_VOCAB', type=str, default='./vocab/sent_vocab.json')
+    parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/tag_vocab.json')
     args = parser.parse_args()
 
     main(args)

@@ -322,15 +322,15 @@ if __name__ == '__main__':
     parser.add_argument('--train', type=bool, default=False)
     parser.add_argument('--test', type=bool, default=True)
 
-    parser.add_argument('--TRAIN', type=str, default='./editData/merge.txt')
+    parser.add_argument('--TRAIN', type=str, default='./editData/train.txt')
     parser.add_argument('--TEST', type=str, default='./editData/test.txt')
 
-    parser.add_argument('--SENT_VOCAB', type=str, default='./vocab/sent_vocab.json')
-    parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/tag_vocab.json')
+    parser.add_argument('--SENT_VOCAB', type=str, default='./vocab/merge_sent_vocab.json')
+    parser.add_argument('--TAG_VOCAB', type=str, default='./vocab/merge_tag_vocab.json')
 
-    parser.add_argument('--MODEL', type=str, default='./model/model.pth')
+    parser.add_argument('--MODEL', type=str, default='./model/model_merge.pth')
 
-    parser.add_argument('--word2vec_path', type=str, default='./model/word2vec/merge_w2v.model')
+    parser.add_argument('--word2vec_path', type=str, default='./model/word2vec/ko.bin')
 
     parser.add_argument('--dropout_rate', type=float, default=0.5)
     parser.add_argument('--embed_size', type=int, default=200)
