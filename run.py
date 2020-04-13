@@ -319,7 +319,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--cuda', type=int, default=1)
 
-    parser.add_argument('--train', type=bool, default=True)
+    parser.add_argument('--train', type=bool, default=False)
     parser.add_argument('--test', type=bool, default=True)
 
     parser.add_argument('--TRAIN', type=str, default='./editData/merge.txt')
