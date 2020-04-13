@@ -5,6 +5,37 @@ import torch
 import utils
 import random
 from vocab import Vocab
+import re
+
+
+def compare_sentence(text, sentence, tags):
+    re_text =[]
+    for t in text:
+        if t == '\n':
+            continue
+        t = t.replace('\n', '')
+        re_text.append(t)
+
+    text_temp = []
+    for t in re_text:
+        temp = t.replace(' ', '')
+        text_temp.append(temp)
+
+    sent = []
+    tag_list = []
+    for t in text_temp:
+        for s, tag in zip(sentence, tags):
+            if t == s:
+                sent.append(s)
+                tag_list.append(tag)
+
+    for i in range(len(re_text)):
+        length = len(re_text[i])
+        for j in range(length):
+            if re_text[i][j] == " ":
+                text = sent[i][:j] + " " + sent[i][j:]
+                sent[i] = text
+    return sent, tag_list
 
 
 def make_sentence(lines):
@@ -42,11 +73,13 @@ def batch_iter(data, batch_size=32, shuffle=True):
 
 
 def main(args):
-    device = torch.device('cuda:0')
+    device = torch.device('cpu')
     model = bilstm_crf.BiLSTMCRF.load(args.MODEL, device)
 
     text = dataEdit.get_lines(args.sample_data)
-    lines = dataEdit.make_morphs(text)
+    morph_lines = dataEdit.make_morphs(text)
+
+    lines = sorted(morph_lines, key=lambda x: len(x), reverse=True)
 
     sent_vocab = Vocab.load(args.SENT_VOCAB)
     tag_vocab = Vocab.load(args.TAG_VOCAB)
@@ -57,10 +90,45 @@ def main(args):
         predicted_tags = model.predict(sentences, sent_lengths)
 
     tags = utils.indices2words(predicted_tags, tag_vocab)
-    for word, tag in zip(text, tags):
-        print(len(word), len(tag))
-        for w, t in zip(word, tag):
-            print(w, t)
+
+    sent = []
+    for line in range(len(sentences)):
+        word = []
+        for i in range(len(sentences[line])):
+            w = sent_vocab.id2word(sentences[line][i])
+            if w == '<PAD>':
+                continue
+            if w == '<UNK>':
+                w = lines[line][i]
+            word.append(w)
+        sent.append(word)
+
+    # print(sent)
+    answer = []
+    for tag, word in zip(tags, sent):
+        result = ""
+        for t, w in zip(tag, word):
+            # if t != '-':
+            #     result += w + '<' + t + '>'
+            result += w
+        answer.append(result)
+    answer, tag_list = compare_sentence(text, answer, tags)
+
+    for i in range(len(answer)):
+        # print(answer[i])
+        # print(morph_lines[i])
+        # print(tag_list[i])
+        temp = answer[i]
+
+        for j in range(len(morph_lines[i])):
+            if tag_list[i][j] == '-':
+                # temp += answer[i][:answer[i].find(morph_lines[i][j])] + answer[i][answer[i].find(morph_lines[i][j]):]
+                continue
+            else:
+                temp = (temp[:temp.find(morph_lines[i][j])] + '<' + tag_list[i][j].split('_')[0] + '>' + temp[temp.find(morph_lines[i][j]):])
+        print(temp)
+    # print(answer)
+    # print(tag_list)
 
 
 if __name__ == '__main__':
