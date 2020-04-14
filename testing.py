@@ -5,6 +5,11 @@ import torch
 import utils
 from vocab import Vocab
 
+"""
+GPU 사용 버전으로 GPU 없는 경우
+device = torch.device('cuda:0') 를
+device = torch.device('cpu') 로 변경 
+"""
 
 def print_line(line, model_path='./model/model.pth', sent_vocab_path='./vocab/sent_vocab.json', tag_vocab_path='./vocab/tag_vocab.json'):
     """
