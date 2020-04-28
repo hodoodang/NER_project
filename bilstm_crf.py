@@ -6,7 +6,7 @@ import utils
 
 
 class BiLSTMCRF(nn.Module):
-    def __init__(self, sent_vocab, tag_vocab, dropout_rate=0.5, embed_size=256, hidden_size=256):
+    def __init__(self, sent_vocab, tag_vocab, word2vec, dropout_rate=0.5, embed_size=256, hidden_size=256):
         """ Initialize the model
         Args:
             sent_vocab (Vocab): vocabulary of words
@@ -20,8 +20,9 @@ class BiLSTMCRF(nn.Module):
         self.hidden_size = hidden_size
         self.sent_vocab = sent_vocab
         self.tag_vocab = tag_vocab
+        self.word2vec = word2vec
         self.embedding = nn.Embedding(len(sent_vocab), embed_size)
-        # self.embedding.from_pretrained(torch.nn.parameter.Parameter(torch.Tensor(word2vec)))
+        self.embedding.from_pretrained(torch.nn.parameter.Parameter(torch.Tensor(self.word2vec)), freeze=False)
         self.dropout = nn.Dropout(dropout_rate)
         self.encoder = nn.LSTM(input_size=embed_size, hidden_size=hidden_size, bidirectional=True)
         self.hidden2emit_score = nn.Linear(hidden_size * 2, len(self.tag_vocab))
@@ -126,6 +127,7 @@ class BiLSTMCRF(nn.Module):
         params = {
             'sent_vocab': self.sent_vocab,
             'tag_vocab': self.tag_vocab,
+            'word2vec': self.word2vec,
             'args': dict(dropout_rate=self.dropout_rate, embed_size=self.embed_size, hidden_size=self.hidden_size),
             'state_dict': self.state_dict()
         }
@@ -134,7 +136,7 @@ class BiLSTMCRF(nn.Module):
     @staticmethod
     def load(filepath, device_to_load):
         params = torch.load(filepath, map_location=lambda storage, loc: storage)
-        model = BiLSTMCRF(params['sent_vocab'], params['tag_vocab'], **params['args'])
+        model = BiLSTMCRF(params['sent_vocab'], params['tag_vocab'], params['word2vec'], **params['args'])
         model.load_state_dict(params['state_dict'])
         model.to(device_to_load)
         return model

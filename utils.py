@@ -21,9 +21,9 @@ def read_corpus(filepath):
                     tags.append(tag + ['<END>'])
                 sent, tag = ['<START>'], ['<START>']
             else:
-                line = line.split()
-                sent.append(line[0])
-                tag.append(line[1])
+                line = line.split('\t')
+                sent.append(line[0].strip())
+                tag.append(line[1].strip())
     return sentences, tags
 
 
